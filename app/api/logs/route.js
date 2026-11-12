@@ -4,35 +4,18 @@ import { logsIndex } from '@/lib/pinecone';
 
 const CATEGORIES = ['Weather', 'Maintenance', 'Delay', 'Other'];
 
-// GET /api/logs?q=...&mode=semantic|keyword&category=Weather
+// GET /api/logs?q=...&category=Weather  -> semantic (Pinecone vector) search over the logs
 export async function GET(req) {
   const { error } = await requireRole();
   if (error) return error;
 
   const sp = new URL(req.url).searchParams;
   const q = (sp.get('q') || '').trim();
-  const mode = sp.get('mode') === 'keyword' ? 'keyword' : 'semantic';
   const category = CATEGORIES.includes(sp.get('category')) ? sp.get('category') : '';
   if (q.length < 3) return Response.json({ error: 'Query must be at least 3 characters' }, { status: 400 });
 
   try {
-    // ---- keyword mode: MySQL FULLTEXT index (exact words only) ----
-    if (mode === 'keyword') {
-      const [rows] = await pool.execute(
-        `SELECT l.log_id, l.log_text AS text, l.category, f.flight_number,
-                MATCH(l.log_text) AGAINST (? IN NATURAL LANGUAGE MODE) AS score
-           FROM Flight_Logs l
-           JOIN Flights f ON f.flight_id = l.flight_id
-          WHERE MATCH(l.log_text) AGAINST (? IN NATURAL LANGUAGE MODE)
-            AND (? = '' OR l.category = ?)
-          ORDER BY score DESC
-          LIMIT 5`,
-        [q, q, category, category]
-      );
-      return Response.json(rows);
-    }
-
-    // ---- semantic mode: Pinecone embeds the query and returns the 5 nearest logs ----
+    // Pinecone embeds the query text and returns the 5 nearest logs
     const query = { topK: 5, inputs: { text: q } };
     if (category) query.filter = { category: { $eq: category } };
     const res = await logsIndex().searchRecords({ query, fields: ['chunk_text', 'flight_id', 'category'] });
@@ -55,9 +38,9 @@ export async function GET(req) {
       }))
     );
   } catch (e) {
-    if (mode === 'semantic' && !e.sqlState) {
+    if (!e.sqlState) {
       console.error(e);
-      return Response.json({ error: 'Semantic search failed: check PINECONE_API_KEY / PINECONE_INDEX' }, { status: 502 });
+      return Response.json({ error: 'Search failed: check PINECONE_API_KEY / PINECONE_INDEX' }, { status: 502 });
     }
     return dbError(e);
   }

@@ -9,8 +9,7 @@ export default function LogsPage() {
   const me = useMe();
   const [q, setQ] = useState('strong wind during touchdown');
   const [category, setCategory] = useState('');
-  const [semantic, setSemantic] = useState(null);
-  const [keyword, setKeyword] = useState(null);
+  const [results, setResults] = useState(null);
   const [busy, setBusy] = useState(false);
   const [flights, setFlights] = useState([]);
   const [msg, setMsg] = useState(null);
@@ -19,14 +18,11 @@ export default function LogsPage() {
     if (me) api('/api/meta').then(({ ok, data }) => ok && setFlights(data.flights));
   }, [me]);
 
-  // runs BOTH searches so the difference is visible side by side
   async function search(e) {
     e.preventDefault();
     setBusy(true);
-    const params = (mode) => '/api/logs?' + new URLSearchParams({ q, mode, category });
-    const [s, k] = await Promise.all([api(params('semantic')), api(params('keyword'))]);
-    setSemantic(s.ok ? s.data : { error: s.data.error });
-    setKeyword(k.ok ? k.data : { error: k.data.error });
+    const { ok, data } = await api('/api/logs?' + new URLSearchParams({ q, category }));
+    setResults(ok ? data : { error: data.error });
     setBusy(false);
   }
 
@@ -57,16 +53,15 @@ export default function LogsPage() {
                 <option key={c}>{c}</option>
               ))}
             </select>
-            <button className="btn" disabled={busy}>{busy ? 'Searching…' : 'Search both ways'}</button>
+            <button className="btn" disabled={busy}>{busy ? 'Searching…' : 'Search'}</button>
           </form>
           <p className="text-xs text-slate-500">
             Demo queries: “strong wind during touchdown”, “plane needs repair”, “passengers waiting a long time”.
           </p>
         </section>
 
-        <section className="grid md:grid-cols-2 gap-4">
-          <Results title="Semantic (Pinecone vector similarity)" data={semantic} />
-          <Results title="Keyword (MySQL FULLTEXT)" data={keyword} />
+        <section>
+          <Results title="Results" data={results} />
         </section>
 
         <section className="card">
@@ -98,9 +93,7 @@ function Results({ title, data }) {
       <h3 className="font-semibold mb-2">{title}</h3>
       {data === null && <p className="text-sm text-slate-500">Run a search.</p>}
       {data?.error && <p className="text-sm text-red-600">{data.error}</p>}
-      {Array.isArray(data) && data.length === 0 && (
-        <p className="text-sm text-slate-500">No matches: none of these exact words appear in the logs.</p>
-      )}
+      {Array.isArray(data) && data.length === 0 && <p className="text-sm text-slate-500">No matching logs found.</p>}
       {Array.isArray(data) &&
         data.map((r) => (
           <div key={r.log_id} className="border-b border-slate-100 py-2">
