@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* simple shared styles for inputs, buttons and tables */
+@layer components {
+  .input {
+    @apply border border-slate-300 rounded px-2 py-1.5 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500;
+  }
+  .btn {
+    @apply px-3 py-1.5 rounded text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50;
+  }
+  .card {
+    @apply bg-white rounded-lg border border-slate-200 p-4 shadow-sm;
+  }
+  .th {
+    @apply text-left font-semibold px-3 py-2 bg-slate-50 border-b border-slate-200;
+  }
+  .td {
+    @apply px-3 py-2 border-b border-slate-100;
+  }
+}
