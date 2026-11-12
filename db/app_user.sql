@@ -9,8 +9,8 @@
 DROP USER IF EXISTS 'aerosync_app'@'localhost';
 DROP USER IF EXISTS 'aerosync_app'@'127.0.0.1';
 
-CREATE USER 'aerosync_app'@'localhost' IDENTIFIED BY 'CHANGE_ME_Strong#2026';
-CREATE USER 'aerosync_app'@'127.0.0.1' IDENTIFIED BY 'CHANGE_ME_Strong#2026';
+CREATE USER 'aerosync_app'@'localhost' IDENTIFIED BY 'algomania1';
+CREATE USER 'aerosync_app'@'127.0.0.1' IDENTIFIED BY 'algomania1';
 
 GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE ON aerosync.* TO 'aerosync_app'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE ON aerosync.* TO 'aerosync_app'@'127.0.0.1';
