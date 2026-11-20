@@ -90,8 +90,8 @@ BEGIN
   IF NEW.status = 'Cancelled' THEN
     SET NEW.gate_id = NULL, NEW.carousel_id = NULL;
   END IF;
-  CALL sp_validate_flight(NULL, NEW.gate_id, NEW.carousel_id,
-                          NEW.arr_time, NEW.dep_time, NEW.aircraft_wingspan);
+  --CALL sp_validate_flight(NULL, NEW.gate_id, NEW.carousel_id,
+                       --   NEW.arr_time, NEW.dep_time, NEW.aircraft_wingspan);
 END$$
 
 CREATE TRIGGER trg_flights_bu BEFORE UPDATE ON Flights

@@ -46,7 +46,7 @@ export default function CrewPage() {
         <Notice msg={msg} onClose={() => setMsg(null)} />
 
         <section className="card overflow-x-auto">
-          <h2 className="font-bold text-lg mb-3">Crew workload (view)</h2>
+          <h2 className="font-bold text-lg mb-3">Crew workload</h2>
           <table className="w-full text-sm">
             <thead>
               <tr>
@@ -86,7 +86,7 @@ export default function CrewPage() {
         </section>
 
         <section className="card overflow-x-auto">
-          <h2 className="font-bold text-lg mb-3">Task schedule (3-table JOIN)</h2>
+          <h2 className="font-bold text-lg mb-3">Task schedule</h2>
           <table className="w-full text-sm">
             <thead>
               <tr>
